@@ -15,7 +15,7 @@ class SuperPaymentGateway implements PaymentGatewayInterface
             $paymentMessage = $response['message'] ?? null;
             $response['status'] = $res->status();
             $response['success'] = $res->successful();
-            if($response['message'] != 'Payment Successful'){
+            if($paymentMessage != 'Payment Successful'){
                 $response['success'] = false;
             }
             return $response;
