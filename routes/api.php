@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OrdersController;
+use App\Http\Controllers\PaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,3 +22,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::apiResource('orders', OrdersController::class);
 Route::post('orders/{order}/add', [OrdersController::class, 'addProductToOrder']);
+Route::post('orders/{order}/pay', [PaymentController::class, 'payOrder']);
