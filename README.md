@@ -1,8 +1,6 @@
 
 ## Installation
 
-Install project with git
-
 #### Clone Project
 ```bash
   git clone https://github.com/ruddesh/loop-backend-api.git loop-backend-api
