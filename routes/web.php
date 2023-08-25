@@ -18,7 +18,3 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/orders', [OrdersController::class, 'index']);
-Route::post('/orders', [OrdersController::class, 'store']);
-Route::put('/orders/{id}', [OrdersController::class, 'update']);
-Route::delete('/orders/{id}', [OrdersController::class, 'destroy']);
