@@ -1,4 +1,9 @@
 
+# The API Webshop
+
+Simplified mini webshop. It consists of customers, products and orders. Written in PHP (Laravel) and setup using docker with sail.
+
+
 ## Installation
 
 #### Clone Project
