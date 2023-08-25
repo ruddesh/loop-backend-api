@@ -31,8 +31,9 @@
 ```bash
   ./vendor/bin/sail up
 ```
-#### open laravel running container in CLI (through docker desktop) and run artisan command to import csv data into customers and products
+#### open laravel running container in CLI (through docker desktop), run artisan commands to run migrations and import csv data into customers and products
 ```bash
+  php artisan migrate
   php artisan import:csv-data 
 ```
 ## Endpoints
