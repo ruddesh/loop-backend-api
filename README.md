@@ -13,14 +13,20 @@
 ```bash
   composer require laravel/sail --dev
 ```
-#### sail composer
+#### .env file
 ```bash
-  php artisan sail:install
+  cp .env.example .env
 ```
 #### generate key
 ```bash
   php artisan key:generate
 ```
+
+#### sail composer
+```bash
+  php artisan sail:install
+```
+
 #### run sail up to create container for loop-api-backend with mysql
 ```bash
   ./vendor/bin/sail up
