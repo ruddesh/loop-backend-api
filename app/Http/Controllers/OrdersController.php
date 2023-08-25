@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\Orders;
+use App\Models\ProductOrders;
 use Validator;
 
 class OrdersController extends Controller
@@ -34,16 +35,17 @@ class OrdersController extends Controller
     {
         $postData = $request->all();
         $validator = Validator::make($postData, ['customer_id' => 'required', 'payed' => 'required']);
+        $response['status'] = 'failed';
         if ($validator->fails()) {
-            $response['message'] = $validator->errors();;
+            $response['message'] = $validator->errors();
             return response()->json($response, Response::HTTP_BAD_REQUEST);
         }
         $order = Orders::create($postData);
         $orderId = $order->id ?? null;
-        $response = ['message' => 'something went wrong'];
         $resCode = Response::HTTP_BAD_REQUEST;
         if(isset($orderId)){
-            $response = [ 'order_id' => $order->id, 'message' => 'order created'];
+            $response['status'] = 'success';
+            $response['message'] = 'order created';
             $resCode = Response::HTTP_OK;
         }
         return response()->json($response, $resCode);
@@ -70,7 +72,7 @@ class OrdersController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $res = ['message' => 'failed'];
+        $res = ['status' => 'failed'];
         $resCode = Response::HTTP_BAD_REQUEST;
         $postData = $request->all();
         $req = array_merge($postData, ['id' => $id]);
@@ -81,12 +83,13 @@ class OrdersController extends Controller
         ]);
         if($validator->fails()){
             $response['message'] = $validator->errors();;
+            $response['status'] = 'failed';
             return response()->json($response, Response::HTTP_BAD_REQUEST);
         }
         $order = Orders::select(['id'])->find($id);
         if(!is_null($order)){
             $updated = Orders::where('id', $id)->update($postData);
-            $res = ['message' => 'success', 'order_id' => $id];
+            $res = ['status' => 'success', 'order_id' => $id];
             $resCode = Response::HTTP_OK;
         }
         return response()->json($res, $resCode);
@@ -99,16 +102,45 @@ class OrdersController extends Controller
     {
         $validator = Validator::make(['id' => $id], ['id' => 'required|numeric']);
         if($validator->fails()){
-            $response['message'] = $validator->errors();;
+            $response['message'] = $validator->errors();
+            $response['status'] = 'failed';
             return response()->json($response, Response::HTTP_BAD_REQUEST);
         }
         $deleted = Orders::destroy($id);
-        $res = ['message' => 'failed'];
+        $res = ['status' => 'failed'];
         $resCode = Response::HTTP_BAD_REQUEST;
         if($deleted){
-            $res = ['message' => 'success', 'order_id' => $id];
+            $res = ['status' => 'success', 'order_id' => $id];
             $resCode = Response::HTTP_OK;
         }
         return response()->json($res, $resCode);
+    }
+
+    public function addProductToOrder(Request $request, string $id)
+    {
+        $postData = $request->all();
+        $req = array_merge($postData, ['id' => $id]);
+        $validator = Validator::make($req, ['product_id' => 'required|numeric', 'id' => 'required|numeric']);
+        if($validator->fails()){
+            $response['message'] = $validator->errors();;
+            $response['status'] = 'failed';
+            return response()->json($response, Response::HTTP_BAD_REQUEST);
+        }
+        $productId = $postData['product_id'] ?? null;
+        $order = Orders::select(['id', 'payed'])->find($id);
+        $orderArr = !is_null($order) ? $order->toArray() : [];
+        
+        if(!empty($orderArr)){
+            if($orderArr['payed']){
+                return response()->json(["Order with id $id is already paid."], Response::HTTP_OK);
+            }
+            $productOrder = ProductOrders::insert([
+                'order_id' => $order['id'],
+                'product_id' => $productId,
+            ]);
+            return response()->json(["status" => "success"], Response::HTTP_OK);
+        } else {
+            return response()->json(["Order with id $id does not exist."], Response::HTTP_BAD_REQUEST);
+        }
     }
 }
