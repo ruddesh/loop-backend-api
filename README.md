@@ -50,7 +50,9 @@ Simplified mini webshop. It consists of customers, products and orders. Written 
     POST api/orders/{order}/add -- add product to order
     POTS api/orders/{order}/pay -- pay order
 ```
+## Postman API Doc
 
+https://documenter.getpostman.com/view/15243104/2s9Y5YR2md
 ## Tech Stack
 
 **Server:** PHP, Laravel, Mysql, Docker
