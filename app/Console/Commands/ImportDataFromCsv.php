@@ -35,9 +35,6 @@ class ImportDataFromCsv extends Command
         $customersFile = "customers.csv";
         $products = $this->getDataFromCsvFile($productsFile);
         $customers = $this->getDataFromCsvFile($customersFile, ['id','job_title','email_address','name','registered_since','phone']);
-        // $productChumks = collect($products);
-        // $chunks = $productChumks->chunk(20); 
-        // dd($chunks, count($chunks));
         if(!empty($products)){
             try {
                 $this->info("INPROGRESS || importing ". count($products) ." Products into DB ". date('Y-m-d H:i:s'));
@@ -48,8 +45,8 @@ class ImportDataFromCsv extends Command
                 $this->info("INPROGRESS || imported ". $insertedProducts ." Products into DB ". date('Y-m-d H:i:s'));
                 Log::info("INPROGRESS || imported ". $insertedProducts ." Products into DB ". date('Y-m-d H:i:s'));
                 
-                $this->info("INPROGRESS || not imported ". count($products) - $insertedProducts ." Products into DB ". date('Y-m-d H:i:s'));
-                Log::info("INPROGRESS || not imported ". count($products) - $insertedProducts ." Products into DB ". date('Y-m-d H:i:s'));
+                $this->info("INPROGRESS || failed importes ". count($products) - $insertedProducts ." Products into DB ". date('Y-m-d H:i:s'));
+                Log::info("INPROGRESS || failed importes ". count($products) - $insertedProducts ." Products into DB ". date('Y-m-d H:i:s'));
             } catch (\Exception $e) {
                 $this->info("FAILED Products insert || ". $e->getMessage() ." ". date('Y-m-d H:i:s'));                
                 Log::error("FAILED Products insert || ". $e->getMessage() ." ". date('Y-m-d H:i:s'));
@@ -63,33 +60,39 @@ class ImportDataFromCsv extends Command
                 Customers::insert($customers);
                 $insertedCustomers = Customers::where('created_at', '>=', $currentTime)->count();
                 $this->info("INPROGRESS || imported ". $insertedCustomers ." Customers into DB ". date('Y-m-d H:i:s'));
-                Log::info("INPROGRESS || imported ". $insertedCustomers ." Customers into DB ". date('Y-m-d H:i:s'));
+                Log::info("INPROGRESS || imported ". $insertedCustomers ." Customers into DB ");
                 
-                $this->info("INPROGRESS || not imported ". count($customers) - $insertedCustomers ." Customers into DB ". date('Y-m-d H:i:s'));
-                Log::info("INPROGRESS || not imported ". count($customers) - $insertedCustomers ." Customers into DB ". date('Y-m-d H:i:s'));
+                $this->info("INPROGRESS || failed importes ". count($customers) - $insertedCustomers ." Customers into DB ". date('Y-m-d H:i:s'));
+                Log::info("INPROGRESS || failed importes ". count($customers) - $insertedCustomers ." Customers into DB ");
 
             } catch (\Exception $e) {
-                $this->info("FAILED Customers insert || ". $e->getMessage() ." ". date('Y-m-d H:i:s'));                
-                Log::error("FAILED Customers insert || ". $e->getMessage() ." ". date('Y-m-d H:i:s'));
+                $this->info("FAILED Customers insert || ". $e->getMessage() ." ". date('Y-m-d H:i:s'));
+                Log::error("FAILED Customers insert || ". $e->getMessage());
             }
         }
         $this->info('END import csv data into DB '. date('Y-m-d H:i:s'));
-        Log::info('END import csv data indo DB'. date('Y-m-d H:i:s'));
+        Log::info('END import csv data indo DB');
     }
 
     public function getDataFromCsvFile($fileName, $columns = [])
     {
-        $finalData = [];
-        if(file_exists($fileName)){
-            $file = fopen($fileName, "r");
-            $header = fgetcsv($file);
-            !empty($columns) && $header = $columns;
-            while ($row = fgetcsv($file)) {
-                $data = array_combine($header, $row);
-                array_push($finalData, $data);
+        try {
+            $finalData = [];
+            if(file_exists($fileName)){
+                $file = fopen($fileName, "r");
+                $header = fgetcsv($file);
+                !empty($columns) && $header = $columns;
+                while ($row = fgetcsv($file)) {
+                    $data = array_combine($header, $row);
+                    array_push($finalData, $data);
+                }
+                fclose($file);
             }
-            fclose($file);
+            return $finalData;
+        } catch (\Exception $e) {
+            $this->info("FAILED getDataFromCsvFile || ". $e->getMessage() ." ". date('Y-m-d H:i:s'));
+            Log::error("FAILED getDataFromCsvFile || ". $e->getMessage());
+            return [];
         }
-        return $finalData;
     }
 }
