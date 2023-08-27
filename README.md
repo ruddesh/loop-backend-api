@@ -44,11 +44,11 @@ Simplified mini webshop. It consists of customers, products and orders. Written 
 ## Endpoints
 ```bash
     GET api/orders              -- get orders
-    POTS api/orders             -- create order
+    POST api/orders             -- create order
     PUT api/orders/{order}      -- update order
     DELETE api/orders/{order}   -- delete order
     POST api/orders/{order}/add -- add product to order
-    POTS api/orders/{order}/pay -- pay order
+    POST api/orders/{order}/pay -- pay order
 ```
 ## Postman API Doc
 
